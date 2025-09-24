@@ -1,0 +1,821 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🔍 AI Phone Review Search Engine</title>
+    
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    
+    <style>
+        :root {
+            --primary-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            --secondary-gradient: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            --success-color: #4CAF50;
+            --warning-color: #FF9800;
+            --danger-color: #F44336;
+            --shadow-light: 0 2px 10px rgba(0,0,0,0.1);
+            --shadow-medium: 0 4px 15px rgba(0,0,0,0.15);
+            --shadow-heavy: 0 8px 30px rgba(0,0,0,0.2);
+        }
+        
+        body {
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            min-height: 100vh;
+        }
+        
+        .main-header {
+            background: var(--primary-gradient);
+            color: white;
+            padding: 3rem 0;
+            text-align: center;
+            box-shadow: var(--shadow-medium);
+            margin-bottom: 2rem;
+        }
+        
+        .search-card {
+            background: white;
+            border-radius: 20px;
+            box-shadow: var(--shadow-medium);
+            padding: 2rem;
+            margin-bottom: 2rem;
+            border: none;
+        }
+        
+        .search-input {
+            border: 2px solid #e9ecef;
+            border-radius: 50px;
+            padding: 1rem 1.5rem;
+            font-size: 1.1rem;
+            transition: all 0.3s ease;
+        }
+        
+        .search-input:focus {
+            border-color: #667eea;
+            box-shadow: 0 0 0 0.2rem rgba(102, 126, 234, 0.25);
+        }
+        
+        .search-btn {
+            background: var(--primary-gradient);
+            border: none;
+            border-radius: 50px;
+            padding: 1rem 2rem;
+            font-weight: bold;
+            color: white;
+            transition: transform 0.2s ease;
+            box-shadow: var(--shadow-light);
+        }
+        
+        .search-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-medium);
+            color: white;
+        }
+        
+        .search-btn:disabled {
+            opacity: 0.7;
+            transform: none;
+        }
+        
+        .layer-badge {
+            display: inline-block;
+            padding: 0.3rem 0.8rem;
+            border-radius: 20px;
+            color: white;
+            font-size: 0.8rem;
+            font-weight: bold;
+            margin: 0.2rem;
+        }
+        
+        .layer-google { background: #4285f4; }
+        .layer-api { background: #34a853; }
+        .layer-offline { background: #ea4335; }
+        
+        .result-card {
+            background: white;
+            border-radius: 15px;
+            box-shadow: var(--shadow-light);
+            padding: 1.5rem;
+            margin-bottom: 1rem;
+            border-left: 4px solid #667eea;
+            transition: transform 0.2s ease;
+        }
+        
+        .result-card:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-medium);
+        }
+        
+        .stat-card {
+            background: var(--primary-gradient);
+            color: white;
+            padding: 2rem;
+            border-radius: 15px;
+            text-align: center;
+            box-shadow: var(--shadow-medium);
+            height: 100%;
+        }
+        
+        .stat-card h3 {
+            font-size: 2.5rem;
+            font-weight: bold;
+            margin-bottom: 0.5rem;
+        }
+        
+        .confidence-bar {
+            height: 8px;
+            background: #f0f0f0;
+            border-radius: 4px;
+            overflow: hidden;
+            margin: 0.5rem 0;
+        }
+        
+        .confidence-fill {
+            height: 100%;
+            background: var(--primary-gradient);
+            transition: width 0.8s ease;
+        }
+        
+        .progress-container {
+            background: white;
+            border-radius: 10px;
+            padding: 1.5rem;
+            box-shadow: var(--shadow-light);
+            margin: 1rem 0;
+        }
+        
+        .spinner-border-custom {
+            width: 1.5rem;
+            height: 1.5rem;
+            border-width: 2px;
+        }
+        
+        .fade-in {
+            animation: fadeIn 0.5s ease-in;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .pulse {
+            animation: pulse 2s infinite;
+        }
+        
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+        
+        .feature-icon {
+            font-size: 3rem;
+            background: var(--primary-gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        .export-btn {
+            background: var(--secondary-gradient);
+            border: none;
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 25px;
+            margin: 0.2rem;
+            transition: transform 0.2s ease;
+        }
+        
+        .export-btn:hover {
+            transform: translateY(-1px);
+            color: white;
+        }
+        
+        .advanced-options {
+            background: #f8f9fa;
+            border-radius: 15px;
+            padding: 1.5rem;
+            margin: 1rem 0;
+        }
+        
+        @media (max-width: 768px) {
+            .main-header {
+                padding: 2rem 0;
+            }
+            
+            .search-card {
+                padding: 1.5rem;
+            }
+            
+            .stat-card h3 {
+                font-size: 2rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Main Header -->
+    <div class="main-header">
+        <div class="container">
+            <h1><i class="fas fa-search"></i> AI-Powered Phone Review Search Engine</h1>
+            <p class="lead">Advanced hybrid search with Google API, external sources, and smart fallbacks</p>
+            <div class="mt-3">
+                <span class="badge bg-light text-dark me-2">Google Search</span>
+                <span class="badge bg-light text-dark me-2">External APIs</span>
+                <span class="badge bg-light text-dark me-2">Smart Fallbacks</span>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Main Content -->
+    <div class="container">
+        <!-- Search Interface -->
+        <div class="search-card">
+            <div class="row align-items-end">
+                <div class="col-md-8">
+                    <label for="phoneQuery" class="form-label h5">
+                        <i class="fas fa-mobile-alt"></i> Search for any phone model:
+                    </label>
+                    <input type="text" class="form-control search-input" id="phoneQuery" 
+                           placeholder="e.g., iPhone 15 Pro, Samsung Galaxy S24, Google Pixel 8"
+                           onkeypress="handleEnterPress(event)">
+                    <small class="text-muted">Enter phone model name, brand, or natural language query</small>
+                </div>
+                <div class="col-md-2">
+                    <label for="searchDepth" class="form-label">Search Depth:</label>
+                    <select class="form-select" id="searchDepth">
+                        <option value="basic">Basic</option>
+                        <option value="standard" selected>Standard</option>
+                        <option value="comprehensive">Comprehensive</option>
+                    </select>
+                </div>
+                <div class="col-md-2">
+                    <button class="btn search-btn w-100" id="searchBtn" onclick="performSearch()">
+                        <i class="fas fa-rocket"></i> Search Phone
+                    </button>
+                </div>
+            </div>
+            
+            <!-- Advanced Options -->
+            <div class="mt-3">
+                <button class="btn btn-outline-secondary btn-sm" type="button" data-bs-toggle="collapse" 
+                        data-bs-target="#advancedOptions">
+                    <i class="fas fa-cog"></i> Advanced Options
+                </button>
+            </div>
+            
+            <div class="collapse" id="advancedOptions">
+                <div class="advanced-options">
+                    <div class="row">
+                        <div class="col-md-4">
+                            <h6>Search Sources:</h6>
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" id="enableGoogle" checked>
+                                <label class="form-check-label" for="enableGoogle">
+                                    <i class="fab fa-google"></i> Google Search
+                                </label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" id="enableAPIs" checked>
+                                <label class="form-check-label" for="enableAPIs">
+                                    <i class="fas fa-link"></i> External APIs
+                                </label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" id="enableOffline" checked>
+                                <label class="form-check-label" for="enableOffline">
+                                    <i class="fas fa-database"></i> Offline Fallback
+                                </label>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <label for="maxResults" class="form-label">Max Results per Source:</label>
+                            <input type="range" class="form-range" id="maxResults" min="1" max="10" value="5">
+                            <small class="text-muted">Current: <span id="maxResultsValue">5</span></small>
+                        </div>
+                        <div class="col-md-4">
+                            <label for="confidenceThreshold" class="form-label">Min Confidence:</label>
+                            <input type="range" class="form-range" id="confidenceThreshold" min="0" max="100" value="50">
+                            <small class="text-muted">Current: <span id="confidenceValue">50</span>%</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Search Progress -->
+        <div id="progressContainer" class="progress-container" style="display: none;">
+            <div class="d-flex align-items-center">
+                <div class="spinner-border spinner-border-custom text-primary me-3" role="status">
+                    <span class="visually-hidden">Loading...</span>
+                </div>
+                <div class="flex-grow-1">
+                    <div class="d-flex justify-content-between align-items-center mb-2">
+                        <span id="progressText">Initializing search...</span>
+                        <small class="text-muted" id="progressPercent">0%</small>
+                    </div>
+                    <div class="progress">
+                        <div class="progress-bar progress-bar-striped progress-bar-animated" 
+                             id="progressBar" role="progressbar" style="width: 0%"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Results Container -->
+        <div id="resultsContainer" style="display: none;">
+            <!-- Key Metrics -->
+            <div class="row mb-4" id="keyMetrics">
+                <!-- Metrics will be populated here -->
+            </div>
+            
+            <!-- Phone Overview -->
+            <div class="result-card" id="phoneOverview">
+                <!-- Phone overview will be populated here -->
+            </div>
+            
+            <!-- Key Insights -->
+            <div class="result-card" id="keyInsights" style="display: none;">
+                <!-- Key insights will be populated here -->
+            </div>
+            
+            <!-- Detailed Results -->
+            <div class="result-card">
+                <h4><i class="fas fa-list-ul"></i> Detailed Search Results</h4>
+                <div id="detailedResults">
+                    <!-- Detailed results will be populated here -->
+                </div>
+                
+                <!-- Export Options -->
+                <div class="mt-4 text-center">
+                    <h5><i class="fas fa-download"></i> Export Results</h5>
+                    <button class="btn export-btn" onclick="exportResults('json')">
+                        <i class="fas fa-file-code"></i> Export as JSON
+                    </button>
+                    <button class="btn export-btn" onclick="exportResults('csv')">
+                        <i class="fas fa-table"></i> Export as CSV
+                    </button>
+                    <button class="btn export-btn" onclick="copyResults()">
+                        <i class="fas fa-copy"></i> Copy Summary
+                    </button>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Error Container -->
+        <div id="errorContainer" class="alert alert-danger" style="display: none;" role="alert">
+            <i class="fas fa-exclamation-triangle"></i>
+            <span id="errorMessage"></span>
+        </div>
+        
+        <!-- Features Section -->
+        <div class="row mt-5 mb-5">
+            <div class="col-md-4 text-center mb-4">
+                <i class="fas fa-search feature-icon"></i>
+                <h4 class="mt-3">Hybrid Search</h4>
+                <p class="text-muted">Combines multiple search layers for comprehensive coverage</p>
+            </div>
+            <div class="col-md-4 text-center mb-4">
+                <i class="fas fa-brain feature-icon"></i>
+                <h4 class="mt-3">AI-Powered</h4>
+                <p class="text-muted">Smart query parsing and intelligent result processing</p>
+            </div>
+            <div class="col-md-4 text-center mb-4">
+                <i class="fas fa-shield-alt feature-icon"></i>
+                <h4 class="mt-3">Reliable Fallbacks</h4>
+                <p class="text-muted">Multiple backup systems ensure results are always available</p>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Footer -->
+    <footer class="text-center text-muted py-4">
+        <div class="container">
+            <p>&copy; 2024 AI Phone Review Search Engine | Powered by Ultimate Hybrid Search Technology</p>
+        </div>
+    </footer>
+    
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <!-- Custom JavaScript -->
+    <script>
+        let currentSearchResults = null;
+        
+        // Initialize range sliders
+        document.getElementById('maxResults').addEventListener('input', function() {
+            document.getElementById('maxResultsValue').textContent = this.value;
+        });
+        
+        document.getElementById('confidenceThreshold').addEventListener('input', function() {
+            document.getElementById('confidenceValue').textContent = this.value;
+        });
+        
+        function handleEnterPress(event) {
+            if (event.key === 'Enter') {
+                performSearch();
+            }
+        }
+        
+        async function performSearch() {
+            const query = document.getElementById('phoneQuery').value.trim();
+            if (!query) {
+                showError('Please enter a phone model to search');
+                return;
+            }
+            
+            // Hide previous results and errors
+            hideResults();
+            hideError();
+            
+            // Show progress
+            showProgress();
+            
+            // Disable search button
+            const searchBtn = document.getElementById('searchBtn');
+            searchBtn.disabled = true;
+            searchBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Searching...';
+            
+            try {
+                // Prepare search data
+                const searchData = {
+                    query: query,
+                    search_depth: document.getElementById('searchDepth').value,
+                    options: {
+                        enable_google: document.getElementById('enableGoogle').checked,
+                        enable_apis: document.getElementById('enableAPIs').checked,
+                        enable_offline: document.getElementById('enableOffline').checked,
+                        max_results: parseInt(document.getElementById('maxResults').value),
+                        confidence_threshold: parseInt(document.getElementById('confidenceThreshold').value) / 100
+                    }
+                };
+                
+                // Update progress
+                updateProgress(20, '🌐 Starting hybrid search...');
+                
+                // Make API call
+                const response = await fetch('/api/search', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(searchData)
+                });
+                
+                updateProgress(80, '📊 Processing results...');
+                
+                const result = await response.json();
+                
+                if (result.success) {
+                    currentSearchResults = result;
+                    updateProgress(100, '✅ Search completed!');
+                    setTimeout(() => {
+                        hideProgress();
+                        displayResults(result);
+                    }, 1000);
+                } else {
+                    throw new Error(result.error || 'Search failed');
+                }
+                
+            } catch (error) {
+                console.error('Search error:', error);
+                hideProgress();
+                showError(`Search failed: ${error.message}`);
+            } finally {
+                // Re-enable search button
+                searchBtn.disabled = false;
+                searchBtn.innerHTML = '<i class="fas fa-rocket"></i> Search Phone';
+            }
+        }
+        
+        function showProgress() {
+            document.getElementById('progressContainer').style.display = 'block';
+            document.getElementById('progressContainer').scrollIntoView({ behavior: 'smooth' });
+        }
+        
+        function hideProgress() {
+            document.getElementById('progressContainer').style.display = 'none';
+        }
+        
+        function updateProgress(percent, text) {
+            document.getElementById('progressBar').style.width = percent + '%';
+            document.getElementById('progressPercent').textContent = percent + '%';
+            document.getElementById('progressText').textContent = text;
+        }
+        
+        function displayResults(data) {
+            if (!data.phone_found) {
+                showError('😔 No results found for your search query');
+                return;
+            }
+            
+            // Display key metrics
+            displayKeyMetrics(data);
+            
+            // Display phone overview
+            displayPhoneOverview(data);
+            
+            // Display key insights
+            displayKeyInsights(data);
+            
+            // Display detailed results
+            displayDetailedResults(data);
+            
+            // Show results container
+            const resultsContainer = document.getElementById('resultsContainer');
+            resultsContainer.style.display = 'block';
+            resultsContainer.classList.add('fade-in');
+            resultsContainer.scrollIntoView({ behavior: 'smooth' });
+        }
+        
+        function displayKeyMetrics(data) {
+            const keyMetrics = document.getElementById('keyMetrics');
+            keyMetrics.innerHTML = `
+                <div class="col-md-3">
+                    <div class="stat-card">
+                        <h3>${data.total_results}</h3>
+                        <p>Total Results</p>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="stat-card">
+                        <h3 style="color: ${getConfidenceColor(data.confidence)}">${(data.confidence * 100).toFixed(1)}%</h3>
+                        <p>Confidence</p>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="stat-card">
+                        <h3>${data.search_layers_used.length}</h3>
+                        <p>Search Layers</p>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="stat-card">
+                        <h3>${'⭐'.repeat(Math.floor(data.overall_rating || 0))}</h3>
+                        <p>Rating (${(data.overall_rating || 0).toFixed(1)}/5)</p>
+                    </div>
+                </div>
+            `;
+        }
+        
+        function displayPhoneOverview(data) {
+            const phoneOverview = document.getElementById('phoneOverview');
+            
+            const layerBadges = data.search_layers_used.map(layer => 
+                `<span class="layer-badge layer-${getLayerClass(layer)}">${layer.replace('_', ' ').toUpperCase()}</span>`
+            ).join('');
+            
+            const priceInfo = data.price_info && data.price_info.avg_price ? 
+                `<p><strong>Price:</strong> ${data.price_info.avg_price}</p>` : '';
+            
+            phoneOverview.innerHTML = `
+                <div class="row">
+                    <div class="col-md-8">
+                        <h3><i class="fas fa-mobile-alt"></i> ${data.phone_model}</h3>
+                        <p><strong>Overall Sentiment:</strong> ${data.overall_sentiment.charAt(0).toUpperCase() + data.overall_sentiment.slice(1)} ${getSentimentEmoji(data.overall_sentiment)}</p>
+                        ${priceInfo}
+                        <p><strong>Search Layers Used:</strong></p>
+                        <div>${layerBadges}</div>
+                    </div>
+                    <div class="col-md-4 text-center">
+                        <div class="mt-3">
+                            <h5>Confidence</h5>
+                            <div class="confidence-bar">
+                                <div class="confidence-fill" style="width: ${data.confidence * 100}%"></div>
+                            </div>
+                            <small class="text-muted">${(data.confidence * 100).toFixed(1)}%</small>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+        
+        function displayKeyInsights(data) {
+            if (!data.key_features.length && !data.pros.length && !data.cons.length) {
+                return;
+            }
+            
+            const keyInsights = document.getElementById('keyInsights');
+            
+            const featuresHtml = data.key_features.length ? `
+                <div class="col-md-4">
+                    <h5><i class="fas fa-star"></i> Key Features:</h5>
+                    <ul>
+                        ${data.key_features.map(feature => `<li>${feature}</li>`).join('')}
+                    </ul>
+                </div>
+            ` : '';
+            
+            const prosHtml = data.pros.length ? `
+                <div class="col-md-4">
+                    <h5><i class="fas fa-thumbs-up text-success"></i> Pros:</h5>
+                    <ul>
+                        ${data.pros.map(pro => `<li>${pro}</li>`).join('')}
+                    </ul>
+                </div>
+            ` : '';
+            
+            const consHtml = data.cons.length ? `
+                <div class="col-md-4">
+                    <h5><i class="fas fa-thumbs-down text-danger"></i> Cons:</h5>
+                    <ul>
+                        ${data.cons.map(con => `<li>${con}</li>`).join('')}
+                    </ul>
+                </div>
+            ` : '';
+            
+            keyInsights.innerHTML = `
+                <h4><i class="fas fa-lightbulb"></i> Key Insights</h4>
+                <div class="row">
+                    ${featuresHtml}
+                    ${prosHtml}
+                    ${consHtml}
+                </div>
+            `;
+            
+            keyInsights.style.display = 'block';
+        }
+        
+        function displayDetailedResults(data) {
+            const detailedResults = document.getElementById('detailedResults');
+            
+            if (!data.search_results.length) {
+                detailedResults.innerHTML = '<p class="text-muted">No detailed results available.</p>';
+                return;
+            }
+            
+            const resultsHtml = data.search_results.map((result, index) => `
+                <div class="card mb-3">
+                    <div class="card-header">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <h6 class="mb-0">📋 Result ${index + 1}: ${result.source}</h6>
+                            <span class="badge bg-primary">${(result.confidence * 100).toFixed(1)}% confidence</span>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-8">
+                                <h6>${result.title}</h6>
+                                <p class="text-muted">${result.snippet}</p>
+                                ${result.url ? `<p><strong>URL:</strong> <a href="${result.url}" target="_blank">${result.url}</a></p>` : ''}
+                                ${result.price ? `<p><strong>Price:</strong> ${result.price}</p>` : ''}
+                                ${result.rating ? `<p><strong>Rating:</strong> ${result.rating.toFixed(1)}/5 ⭐</p>` : ''}
+                            </div>
+                            <div class="col-md-4 text-end">
+                                <span class="layer-badge layer-${getLayerClass(result.search_layer)}">
+                                    ${result.search_layer.replace('_', ' ').toUpperCase()}
+                                </span>
+                                <small class="d-block text-muted mt-2">${new Date(result.retrieved_at).toLocaleString()}</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+            
+            detailedResults.innerHTML = resultsHtml;
+        }
+        
+        function showError(message) {
+            const errorContainer = document.getElementById('errorContainer');
+            const errorMessage = document.getElementById('errorMessage');
+            errorMessage.textContent = message;
+            errorContainer.style.display = 'block';
+            errorContainer.scrollIntoView({ behavior: 'smooth' });
+        }
+        
+        function hideError() {
+            document.getElementById('errorContainer').style.display = 'none';
+        }
+        
+        function hideResults() {
+            document.getElementById('resultsContainer').style.display = 'none';
+        }
+        
+        function getConfidenceColor(confidence) {
+            if (confidence >= 0.8) return '#4CAF50';
+            if (confidence >= 0.6) return '#FF9800';
+            return '#F44336';
+        }
+        
+        function getSentimentEmoji(sentiment) {
+            const emojiMap = {
+                'positive': '😊',
+                'negative': '😞',
+                'neutral': '😐'
+            };
+            return emojiMap[sentiment] || '😐';
+        }
+        
+        function getLayerClass(layer) {
+            if (layer.toLowerCase().includes('google')) return 'google';
+            if (layer.toLowerCase().includes('api')) return 'api';
+            return 'offline';
+        }
+        
+        function exportResults(format) {
+            if (!currentSearchResults) {
+                showError('No results to export');
+                return;
+            }
+            
+            if (format === 'json') {
+                const jsonData = JSON.stringify(currentSearchResults, null, 2);
+                downloadFile(jsonData, `phone_search_${currentSearchResults.phone_model}_${new Date().toISOString().slice(0,10)}.json`, 'application/json');
+            } else if (format === 'csv') {
+                const csvData = convertToCSV(currentSearchResults);
+                downloadFile(csvData, `phone_search_${currentSearchResults.phone_model}_${new Date().toISOString().slice(0,10)}.csv`, 'text/csv');
+            }
+        }
+        
+        function copyResults() {
+            if (!currentSearchResults) {
+                showError('No results to copy');
+                return;
+            }
+            
+            const summary = createSummaryText(currentSearchResults);
+            navigator.clipboard.writeText(summary).then(() => {
+                alert('Summary copied to clipboard!');
+            }).catch(err => {
+                console.error('Could not copy text: ', err);
+            });
+        }
+        
+        function downloadFile(data, filename, type) {
+            const blob = new Blob([data], { type: type });
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = filename;
+            document.body.appendChild(a);
+            a.click();
+            window.URL.revokeObjectURL(url);
+            document.body.removeChild(a);
+        }
+        
+        function convertToCSV(data) {
+            const headers = ['Phone', 'Source', 'Title', 'Snippet', 'URL', 'Confidence', 'Rating', 'Price', 'Layer'];
+            const rows = data.search_results.map(result => [
+                data.phone_model,
+                result.source,
+                result.title,
+                result.snippet,
+                result.url || '',
+                result.confidence,
+                result.rating || '',
+                result.price || '',
+                result.search_layer
+            ]);
+            
+            const csvContent = [headers, ...rows]
+                .map(row => row.map(cell => `"${String(cell).replace(/"/g, '""')}"`).join(','))
+                .join('\n');
+            
+            return csvContent;
+        }
+        
+        function createSummaryText(data) {
+            return `📱 Phone Search Results Summary
+
+Phone: ${data.phone_model}
+Confidence: ${(data.confidence * 100).toFixed(1)}%
+Overall Rating: ${data.overall_rating || 'N/A'}
+Sentiment: ${data.overall_sentiment}
+Total Results: ${data.total_results}
+Search Layers: ${data.search_layers_used.join(', ')}
+
+Key Features:
+${data.key_features.slice(0, 5).map(feature => `• ${feature}`).join('\n')}
+
+Top Pros:
+${data.pros.slice(0, 3).map(pro => `• ${pro}`).join('\n')}
+
+Top Cons:
+${data.cons.slice(0, 3).map(con => `• ${con}`).join('\n')}
+
+Generated: ${new Date().toLocaleString()}`;
+        }
+        
+        // Check search engine status on page load
+        document.addEventListener('DOMContentLoaded', async function() {
+            try {
+                const response = await fetch('/api/health');
+                const health = await response.json();
+                
+                if (!health.search_engine_available) {
+                    showError('⚠️ Search engine is not available. Please check the server configuration.');
+                }
+            } catch (error) {
+                console.error('Health check failed:', error);
+            }
+        });
+    </script>
+</body>
+</html>

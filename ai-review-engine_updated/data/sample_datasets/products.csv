@@ -1,0 +1,6 @@
+product_id,name,brand,category,current_price,original_price,overall_rating,total_reviews,specifications
+1,iPhone 15 Pro Max,Apple,Flagship,1299.99,1399.99,4.7,3456,"{""display"": ""6.7\"" OLED"", ""processor"": ""A17 Pro"", ""ram"": ""8GB"", ""storage"": ""256GB"", ""camera_main"": ""48MP"", ""battery"": ""4422mAh""}"
+2,Samsung Galaxy S24 Ultra,Samsung,Flagship,1199.99,1299.99,4.6,2890,"{""display"": ""6.8\"" AMOLED"", ""processor"": ""Snapdragon 8 Gen 3"", ""ram"": ""12GB"", ""storage"": ""256GB"", ""camera_main"": ""200MP"", ""battery"": ""5000mAh""}"
+3,Google Pixel 8 Pro,Google,Flagship,999.99,1099.99,4.5,1567,"{""display"": ""6.7\"" OLED"", ""processor"": ""Tensor G3"", ""ram"": ""12GB"", ""storage"": ""128GB"", ""camera_main"": ""50MP"", ""battery"": ""5050mAh""}"
+4,OnePlus 12,OnePlus,Flagship,799.99,899.99,4.4,892,"{""display"": ""6.82\"" AMOLED"", ""processor"": ""Snapdragon 8 Gen 3"", ""ram"": ""12GB"", ""storage"": ""256GB"", ""camera_main"": ""50MP"", ""battery"": ""5400mAh""}"
+5,Xiaomi 14 Pro,Xiaomi,Mid-Range,699.99,799.99,4.3,1234,"{""display"": ""6.73\"" AMOLED"", ""processor"": ""Snapdragon 8 Gen 3"", ""ram"": ""12GB"", ""storage"": ""256GB"", ""camera_main"": ""50MP"", ""battery"": ""4880mAh""}"

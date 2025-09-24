@@ -1,0 +1,148 @@
+version: '3.8'
+
+services:
+  # PostgreSQL Database
+  postgres:
+    image: postgres:15-alpine
+    container_name: review_engine_db
+    environment:
+      POSTGRES_DB: review_engine
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: ${DB_PASSWORD:-securepassword}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+    networks:
+      - review_engine_network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # Redis for caching and rate limiting
+  redis:
+    image: redis:7-alpine
+    container_name: review_engine_redis
+    command: redis-server --appendonly yes
+    volumes:
+      - redis_data:/data
+    ports:
+      - "6379:6379"
+    networks:
+      - review_engine_network
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # FastAPI Application
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: review_engine_api
+    environment:
+      DATABASE_URL: postgresql://postgres:${DB_PASSWORD:-securepassword}@postgres:5432/review_engine
+      REDIS_URL: redis://redis:6379
+      SECRET_KEY: ${SECRET_KEY:-your-secret-key-change-in-production}
+      PYTHONPATH: /app
+    volumes:
+      - ./data:/app/data
+      - ./logs:/app/logs
+    ports:
+      - "8000:8000"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    networks:
+      - review_engine_network
+    command: python -m uvicorn api.main:app --host 0.0.0.0 --port 8000 --reload
+
+  # Streamlit Web Application
+  streamlit:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: review_engine_web
+    environment:
+      DATABASE_URL: postgresql://postgres:${DB_PASSWORD:-securepassword}@postgres:5432/review_engine
+      API_URL: http://api:8000
+      PYTHONPATH: /app
+    volumes:
+      - ./data:/app/data
+      - ./logs:/app/logs
+    ports:
+      - "8501:8501"
+    depends_on:
+      - api
+    networks:
+      - review_engine_network
+    command: streamlit run app.py --server.port 8501 --server.address 0.0.0.0
+
+  # Nginx Reverse Proxy
+  nginx:
+    image: nginx:alpine
+    container_name: review_engine_nginx
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf:ro
+    ports:
+      - "80:80"
+      - "443:443"
+    depends_on:
+      - api
+      - streamlit
+    networks:
+      - review_engine_network
+
+  # Celery Worker for Background Tasks
+  celery_worker:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: review_engine_celery
+    environment:
+      DATABASE_URL: postgresql://postgres:${DB_PASSWORD:-securepassword}@postgres:5432/review_engine
+      REDIS_URL: redis://redis:6379
+      PYTHONPATH: /app
+    volumes:
+      - ./data:/app/data
+      - ./logs:/app/logs
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    networks:
+      - review_engine_network
+    command: celery -A utils.celery_app worker --loglevel=info
+
+  # Flower for Celery monitoring
+  flower:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: review_engine_flower
+    environment:
+      CELERY_BROKER_URL: redis://redis:6379
+      CELERY_RESULT_BACKEND: redis://redis:6379
+    ports:
+      - "5555:5555"
+    depends_on:
+      - redis
+      - celery_worker
+    networks:
+      - review_engine_network
+    command: celery -A utils.celery_app flower --port=5555
+
+networks:
+  review_engine_network:
+    driver: bridge
+
+volumes:
+  postgres_data:
+  redis_data:

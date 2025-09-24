@@ -1,0 +1,23 @@
+{
+  "total_reviews": 3165,
+  "unique_products": 114,
+  "date_range": {
+    "min": "2025-09-12 17:05:55.802564",
+    "max": "2025-09-12 17:05:55.802564"
+  },
+  "sources": {
+    "gsm_arena": 3165,
+    "ecommerce": 0
+  },
+  "columns": [
+    "review_text",
+    "rating",
+    "brand",
+    "product_name",
+    "user_id",
+    "source",
+    "verified_purchase",
+    "review_date"
+  ],
+  "processed_date": "2025-09-12T17:05:56.367928"
+}

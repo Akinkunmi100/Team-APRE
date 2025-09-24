@@ -1,0 +1,46 @@
+# Production Configuration
+
+application:
+  debug: false
+  secret_key: ${SECRET_KEY}  # Set this via environment variable
+
+database:
+  host: ${DB_HOST}
+  name: ${DB_NAME}
+  user: ${DB_USER}
+  password: ${DB_PASSWORD}
+  pool_size: 20
+  max_overflow: 30
+
+redis:
+  host: ${REDIS_HOST}
+  password: ${REDIS_PASSWORD}
+
+api:
+  workers: 8
+  cors_origins: ["https://your-domain.com"]
+  rate_limit:
+    enabled: true
+    default_limit: 1000
+    period: 3600
+
+web:
+  session_lifetime: 7200
+  templates_auto_reload: false
+
+security:
+  ssl_enabled: true
+  allowed_hosts: ["your-domain.com"]
+  csrf_enabled: true
+  session_secure: true
+  password_hash_method: "pbkdf2:sha256:200000"
+
+logging:
+  level: WARNING
+  format: "%(asctime)s - %(name)s - %(levelname)s - %(message)s - %(request_id)s"
+  file_size: 52428800  # 50MB
+  backup_count: 10
+
+monitoring:
+  enabled: true
+  collection_interval: 30

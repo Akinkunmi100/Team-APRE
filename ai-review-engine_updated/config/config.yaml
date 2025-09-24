@@ -1,0 +1,139 @@
+# AI Review Engine Configuration
+
+# Data Sources
+data_sources:
+  ecommerce:
+    - name: "Jumia"
+      url: "https://www.jumia.com.ng"
+      category: "phones"
+    - name: "Konga"
+      url: "https://www.konga.com"
+      category: "phones"
+    - name: "Temu"
+      url: "https://www.temu.com"
+      category: "phones"
+  
+  review_sites:
+    - name: "GSMArena"
+      url: "https://www.gsmarena.com"
+    - name: "Notebookcheck"
+      url: "https://www.notebookcheck.net"
+    - name: "Reddit"
+      url: "https://www.reddit.com"
+    - name: "Quora"
+      url: "https://www.quora.com"
+  
+  social_media:
+    - name: "TikTok"
+      url: "https://www.tiktok.com"
+    - name: "Instagram"
+      url: "https://www.instagram.com"
+    - name: "Facebook"
+      url: "https://www.facebook.com"
+    - name: "X"
+      url: "https://www.x.com"
+
+# Scraping Settings
+scraping:
+  user_agent: "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36"
+  timeout: 30
+  max_retries: 3
+  delay_between_requests: 2
+  concurrent_requests: 5
+
+# Database Configuration
+database:
+  type: "postgresql"
+  host: "localhost"
+  port: 5432
+  name: "review_engine"
+  user: "postgres"
+  password: ""  # Set via environment variable
+
+# NLP Settings
+nlp:
+  language: "en"
+  min_review_length: 10
+  max_review_length: 5000
+  
+# Sentiment Analysis
+sentiment_analysis:
+  model_type: "absa"  # aspect-based sentiment analysis
+  transformer_model: "yangheng/deberta-v3-base-absa-v1.1"
+  aspects:
+    - "battery"
+    - "camera"
+    - "performance"
+    - "screen"
+    - "design"
+    - "price"
+    - "storage"
+    - "durability"
+    - "software"
+    - "connectivity"
+  
+  sentiment_labels:
+    - "positive"
+    - "negative"
+    - "neutral"
+  
+  confidence_threshold: 0.7
+
+# Model Settings
+model:
+  batch_size: 32
+  max_length: 512
+  learning_rate: 2e-5
+  epochs: 10
+  validation_split: 0.2
+  test_split: 0.1
+
+# Fraud Detection
+fraud_detection:
+  enable: true
+  min_credibility_score: 0.5
+  features:
+    - "review_length"
+    - "sentiment_consistency"
+    - "user_history"
+    - "temporal_patterns"
+    - "language_quality"
+
+# Visualization
+visualization:
+  chart_types:
+    - "sentiment_distribution"
+    - "aspect_sentiment"
+    - "temporal_trends"
+    - "word_cloud"
+  color_scheme:
+    positive: "#28a745"
+    negative: "#dc3545"
+    neutral: "#6c757d"
+
+# Web App Settings
+web_app:
+  title: "AI-Powered Phone Review Engine"
+  host: "0.0.0.0"
+  port: 8501
+  theme: "light"
+  cache_ttl: 3600  # seconds
+
+# Logging
+logging:
+  level: "INFO"
+  format: "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
+  file: "logs/app.log"
+
+# API Settings
+api:
+  version: "v1"
+  prefix: "/api"
+  rate_limit: 100  # requests per minute
+  
+# Performance
+performance:
+  enable_caching: true
+  cache_backend: "redis"
+  parallel_processing: true
+  num_workers: 4

@@ -1,0 +1,11 @@
+user_id,username,email,total_reviews,verified_reviewer
+101,tech_enthusiast,tech@example.com,45,True
+102,casual_user,casual@example.com,12,True
+103,android_fan,android@example.com,67,True
+104,photo_pro,photo@example.com,89,False
+105,pixel_lover,pixel@example.com,23,True
+106,skeptical_buyer,skeptic@example.com,8,True
+107,value_hunter,value@example.com,34,True
+108,camera_critic,camera@example.com,56,False
+109,budget_conscious,budget@example.com,19,True
+110,xiaomi_user,xiaomi@example.com,5,True

@@ -1,0 +1,14 @@
+,Value
+Method,Hybrid (DataPreprocessor + TextBlob)
+Original Reviews,4647
+After Deduplication,4525
+Duplicates Removed,122
+Spam Detected,1
+Clean Reviews,4490
+Avg Credibility,0.989
+Avg Sentiment,0.203
+Positive Reviews,2624
+Negative Reviews,400
+Aspect Mentions,3461
+Key Phrases,1068
+Features Added,15

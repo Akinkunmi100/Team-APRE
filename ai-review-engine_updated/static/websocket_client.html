@@ -1,0 +1,808 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Review Engine - Real-time WebSocket Client</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+        
+        .container {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.2);
+            width: 100%;
+            max-width: 1200px;
+            padding: 30px;
+        }
+        
+        h1 {
+            color: #333;
+            margin-bottom: 30px;
+            text-align: center;
+            font-size: 2.5em;
+        }
+        
+        .status-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px;
+            background: #f8f9fa;
+            border-radius: 10px;
+            margin-bottom: 20px;
+        }
+        
+        .status {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .status-indicator {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: #dc3545;
+        }
+        
+        .status-indicator.connected {
+            background: #28a745;
+            animation: pulse 2s infinite;
+        }
+        
+        @keyframes pulse {
+            0% { box-shadow: 0 0 0 0 rgba(40, 167, 69, 0.7); }
+            70% { box-shadow: 0 0 0 10px rgba(40, 167, 69, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(40, 167, 69, 0); }
+        }
+        
+        .tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            border-bottom: 2px solid #dee2e6;
+        }
+        
+        .tab {
+            padding: 10px 20px;
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-size: 16px;
+            color: #6c757d;
+            transition: all 0.3s;
+        }
+        
+        .tab.active {
+            color: #667eea;
+            border-bottom: 3px solid #667eea;
+            margin-bottom: -2px;
+        }
+        
+        .tab-content {
+            display: none;
+            animation: fadeIn 0.5s;
+        }
+        
+        .tab-content.active {
+            display: block;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        
+        .analysis-section {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+        
+        .input-area {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+        
+        textarea {
+            width: 100%;
+            min-height: 150px;
+            padding: 15px;
+            border: 2px solid #dee2e6;
+            border-radius: 10px;
+            font-size: 14px;
+            resize: vertical;
+            transition: border 0.3s;
+        }
+        
+        textarea:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+        
+        .btn {
+            padding: 12px 30px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 25px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: transform 0.3s;
+        }
+        
+        .btn:hover {
+            transform: translateY(-2px);
+        }
+        
+        .btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+        
+        .results {
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 20px;
+            min-height: 200px;
+        }
+        
+        .result-item {
+            background: white;
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 10px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            animation: slideIn 0.5s;
+        }
+        
+        @keyframes slideIn {
+            from {
+                transform: translateX(-20px);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+        
+        .sentiment {
+            display: inline-block;
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-weight: bold;
+            font-size: 14px;
+        }
+        
+        .sentiment.positive {
+            background: #d4edda;
+            color: #155724;
+        }
+        
+        .sentiment.negative {
+            background: #f8d7da;
+            color: #721c24;
+        }
+        
+        .sentiment.neutral {
+            background: #fff3cd;
+            color: #856404;
+        }
+        
+        .confidence {
+            display: inline-block;
+            margin-left: 10px;
+            color: #6c757d;
+            font-size: 14px;
+        }
+        
+        .emotions, .aspects {
+            margin-top: 10px;
+            display: flex;
+            gap: 5px;
+            flex-wrap: wrap;
+        }
+        
+        .tag {
+            padding: 3px 10px;
+            background: #e9ecef;
+            border-radius: 15px;
+            font-size: 12px;
+            color: #495057;
+        }
+        
+        .chat-section {
+            display: grid;
+            grid-template-columns: 1fr 300px;
+            gap: 20px;
+            height: 500px;
+        }
+        
+        .chat-messages {
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 20px;
+            overflow-y: auto;
+        }
+        
+        .message {
+            margin-bottom: 15px;
+            animation: fadeIn 0.3s;
+        }
+        
+        .message-header {
+            font-weight: bold;
+            color: #667eea;
+            margin-bottom: 5px;
+        }
+        
+        .message-content {
+            background: white;
+            padding: 10px;
+            border-radius: 8px;
+        }
+        
+        .users-list {
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 20px;
+        }
+        
+        .user-item {
+            padding: 10px;
+            background: white;
+            border-radius: 5px;
+            margin-bottom: 5px;
+        }
+        
+        .chat-input {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+        }
+        
+        .chat-input input {
+            flex: 1;
+            padding: 10px;
+            border: 2px solid #dee2e6;
+            border-radius: 25px;
+            font-size: 14px;
+        }
+        
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+        }
+        
+        .stat-card {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px;
+            border-radius: 10px;
+            text-align: center;
+        }
+        
+        .stat-value {
+            font-size: 2em;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+        
+        .stat-label {
+            font-size: 14px;
+            opacity: 0.9;
+        }
+        
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            animation: slideInRight 0.5s;
+            z-index: 1000;
+        }
+        
+        @keyframes slideInRight {
+            from {
+                transform: translateX(100%);
+            }
+            to {
+                transform: translateX(0);
+            }
+        }
+        
+        .loader {
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #667eea;
+            border-radius: 50%;
+            width: 30px;
+            height: 30px;
+            animation: spin 1s linear infinite;
+            margin: 20px auto;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🚀 Real-time AI Review Analysis</h1>
+        
+        <div class="status-bar">
+            <div class="status">
+                <div class="status-indicator" id="statusIndicator"></div>
+                <span id="statusText">Disconnected</span>
+            </div>
+            <div>
+                <span id="statsInfo">Connected clients: 0 | Active rooms: 0</span>
+            </div>
+        </div>
+        
+        <div class="tabs">
+            <button class="tab active" onclick="switchTab('analysis')">Real-time Analysis</button>
+            <button class="tab" onclick="switchTab('chat')">Live Chat</button>
+            <button class="tab" onclick="switchTab('monitoring')">Product Monitoring</button>
+            <button class="tab" onclick="switchTab('stats')">System Stats</button>
+        </div>
+        
+        <div id="analysis" class="tab-content active">
+            <div class="analysis-section">
+                <div class="input-area">
+                    <h3>Enter Review Text</h3>
+                    <textarea id="reviewText" placeholder="Enter a product review to analyze sentiment in real-time...">The new iPhone 15 Pro has an amazing camera! The battery life is excellent and the titanium build feels premium. However, the price is quite high and the heating issue during gaming is disappointing.</textarea>
+                    <button class="btn" onclick="analyzeText()">
+                        Analyze Sentiment
+                    </button>
+                </div>
+                <div class="results">
+                    <h3>Analysis Results</h3>
+                    <div id="analysisResults">
+                        <p style="color: #6c757d;">Results will appear here...</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div id="chat" class="tab-content">
+            <div class="chat-section">
+                <div>
+                    <h3>Live Chat Room</h3>
+                    <div class="chat-messages" id="chatMessages">
+                        <p style="color: #6c757d;">Join a room to start chatting...</p>
+                    </div>
+                    <div class="chat-input">
+                        <input type="text" id="chatInput" placeholder="Type a message..." onkeypress="handleChatKeypress(event)">
+                        <button class="btn" onclick="sendChatMessage()">Send</button>
+                    </div>
+                </div>
+                <div class="users-list">
+                    <h4>Room Info</h4>
+                    <div id="roomInfo">
+                        <p>Room: <span id="currentRoom">None</span></p>
+                        <button class="btn" onclick="joinRoom()">Join Room</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div id="monitoring" class="tab-content">
+            <h3>Product Sentiment Monitoring</h3>
+            <div style="margin-bottom: 20px;">
+                <input type="number" id="productId" placeholder="Enter Product ID" style="padding: 10px; border: 2px solid #dee2e6; border-radius: 5px; margin-right: 10px;">
+                <button class="btn" onclick="subscribeToProduct()">Subscribe to Updates</button>
+            </div>
+            <div class="results">
+                <h4>Trend Analysis</h4>
+                <div id="trendResults">
+                    <p style="color: #6c757d;">Subscribe to a product to see real-time sentiment trends...</p>
+                </div>
+            </div>
+        </div>
+        
+        <div id="stats" class="tab-content">
+            <h3>System Statistics</h3>
+            <div class="stats-grid" id="statsGrid">
+                <div class="stat-card">
+                    <div class="stat-value" id="connectedClients">0</div>
+                    <div class="stat-label">Connected Clients</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value" id="activeRooms">0</div>
+                    <div class="stat-label">Active Rooms</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value" id="modelVersion">-</div>
+                    <div class="stat-label">Model Version</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value" id="messagesProcessed">0</div>
+                    <div class="stat-label">Messages Processed</div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        let ws = null;
+        let clientId = 'client_' + Math.random().toString(36).substr(2, 9);
+        let currentRoom = null;
+        let messagesProcessed = 0;
+        
+        // Initialize WebSocket connection
+        function initWebSocket() {
+            const wsUrl = `ws://localhost:8000/ws/${clientId}`;
+            ws = new WebSocket(wsUrl);
+            
+            ws.onopen = function(event) {
+                console.log('WebSocket connected');
+                updateConnectionStatus(true);
+                // Send ping every 30 seconds to keep connection alive
+                setInterval(() => {
+                    if (ws.readyState === WebSocket.OPEN) {
+                        ws.send(JSON.stringify({ type: 'ping' }));
+                    }
+                }, 30000);
+            };
+            
+            ws.onmessage = function(event) {
+                const message = JSON.parse(event.data);
+                handleWebSocketMessage(message);
+            };
+            
+            ws.onclose = function(event) {
+                console.log('WebSocket disconnected');
+                updateConnectionStatus(false);
+                // Attempt to reconnect after 3 seconds
+                setTimeout(initWebSocket, 3000);
+            };
+            
+            ws.onerror = function(error) {
+                console.error('WebSocket error:', error);
+                showNotification('Connection error occurred', 'error');
+            };
+        }
+        
+        // Handle incoming WebSocket messages
+        function handleWebSocketMessage(message) {
+            console.log('Received message:', message);
+            messagesProcessed++;
+            document.getElementById('messagesProcessed').textContent = messagesProcessed;
+            
+            switch(message.type) {
+                case 'connection':
+                    showNotification('Connected to server', 'success');
+                    break;
+                    
+                case 'analysis_result':
+                    displayAnalysisResult(message.data);
+                    break;
+                    
+                case 'chat_message':
+                    displayChatMessage(message);
+                    break;
+                    
+                case 'product_trend':
+                    displayProductTrend(message.data);
+                    break;
+                    
+                case 'system_stats':
+                    updateSystemStats(message.data);
+                    break;
+                    
+                case 'new_review':
+                    showNotification('New review posted for monitored product', 'info');
+                    displayNewReview(message.data);
+                    break;
+                    
+                case 'typing':
+                    handleTypingIndicator(message);
+                    break;
+            }
+        }
+        
+        // Update connection status UI
+        function updateConnectionStatus(connected) {
+            const indicator = document.getElementById('statusIndicator');
+            const text = document.getElementById('statusText');
+            
+            if (connected) {
+                indicator.classList.add('connected');
+                text.textContent = `Connected (${clientId})`;
+            } else {
+                indicator.classList.remove('connected');
+                text.textContent = 'Disconnected';
+            }
+        }
+        
+        // Switch between tabs
+        function switchTab(tabName) {
+            // Update tab buttons
+            document.querySelectorAll('.tab').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            event.target.classList.add('active');
+            
+            // Update tab content
+            document.querySelectorAll('.tab-content').forEach(content => {
+                content.classList.remove('active');
+            });
+            document.getElementById(tabName).classList.add('active');
+        }
+        
+        // Analyze text sentiment
+        function analyzeText() {
+            const text = document.getElementById('reviewText').value;
+            if (!text.trim()) {
+                showNotification('Please enter some text to analyze', 'warning');
+                return;
+            }
+            
+            if (ws && ws.readyState === WebSocket.OPEN) {
+                const requestId = 'req_' + Date.now();
+                ws.send(JSON.stringify({
+                    type: 'analyze',
+                    data: {
+                        text: text,
+                        request_id: requestId
+                    }
+                }));
+                
+                // Show loading
+                document.getElementById('analysisResults').innerHTML = '<div class="loader"></div>';
+            } else {
+                showNotification('WebSocket not connected', 'error');
+            }
+        }
+        
+        // Display analysis results
+        function displayAnalysisResult(data) {
+            const resultsDiv = document.getElementById('analysisResults');
+            
+            const sentimentClass = data.sentiment.toLowerCase();
+            const confidencePercent = (data.confidence * 100).toFixed(1);
+            
+            let emotionsHtml = '';
+            if (data.emotions && data.emotions.length > 0) {
+                emotionsHtml = `
+                    <div class="emotions">
+                        <strong>Emotions:</strong>
+                        ${data.emotions.map(e => `<span class="tag">${e}</span>`).join('')}
+                    </div>
+                `;
+            }
+            
+            let aspectsHtml = '';
+            if (data.aspects) {
+                const technical = data.aspects.technical || [];
+                const quantitative = data.aspects.quantitative || [];
+                const allAspects = [...technical, ...quantitative];
+                
+                if (allAspects.length > 0) {
+                    aspectsHtml = `
+                        <div class="aspects">
+                            <strong>Aspects:</strong>
+                            ${allAspects.map(a => `<span class="tag">${a}</span>`).join('')}
+                        </div>
+                    `;
+                }
+            }
+            
+            resultsDiv.innerHTML = `
+                <div class="result-item">
+                    <div>
+                        <span class="sentiment ${sentimentClass}">${data.sentiment}</span>
+                        <span class="confidence">Confidence: ${confidencePercent}%</span>
+                    </div>
+                    <div style="margin-top: 10px; color: #6c757d; font-size: 14px;">
+                        ${data.text}
+                    </div>
+                    ${emotionsHtml}
+                    ${aspectsHtml}
+                    <div style="margin-top: 10px; color: #adb5bd; font-size: 12px;">
+                        Analyzed at: ${new Date(data.timestamp).toLocaleTimeString()}
+                    </div>
+                </div>
+            `;
+        }
+        
+        // Join chat room
+        function joinRoom() {
+            const roomName = prompt('Enter room name:');
+            if (roomName) {
+                currentRoom = roomName;
+                document.getElementById('currentRoom').textContent = roomName;
+                
+                // Reconnect with room
+                if (ws) {
+                    ws.close();
+                }
+                
+                const wsUrl = `ws://localhost:8000/ws/${clientId}?room=${roomName}`;
+                ws = new WebSocket(wsUrl);
+                
+                ws.onopen = function() {
+                    updateConnectionStatus(true);
+                    showNotification(`Joined room: ${roomName}`, 'success');
+                    document.getElementById('chatMessages').innerHTML = '';
+                };
+                
+                ws.onmessage = function(event) {
+                    const message = JSON.parse(event.data);
+                    handleWebSocketMessage(message);
+                };
+            }
+        }
+        
+        // Send chat message
+        function sendChatMessage() {
+            const input = document.getElementById('chatInput');
+            const message = input.value.trim();
+            
+            if (!message) return;
+            
+            if (!currentRoom) {
+                showNotification('Please join a room first', 'warning');
+                return;
+            }
+            
+            if (ws && ws.readyState === WebSocket.OPEN) {
+                ws.send(JSON.stringify({
+                    type: 'chat',
+                    data: {
+                        message: message
+                    }
+                }));
+                input.value = '';
+            }
+        }
+        
+        // Handle chat keypress
+        function handleChatKeypress(event) {
+            if (event.key === 'Enter') {
+                sendChatMessage();
+            }
+        }
+        
+        // Display chat message
+        function displayChatMessage(message) {
+            const messagesDiv = document.getElementById('chatMessages');
+            const messageHtml = `
+                <div class="message">
+                    <div class="message-header">${message.client_id}</div>
+                    <div class="message-content">${message.message}</div>
+                    <div style="color: #adb5bd; font-size: 12px; margin-top: 5px;">
+                        ${new Date(message.timestamp).toLocaleTimeString()}
+                    </div>
+                </div>
+            `;
+            messagesDiv.innerHTML += messageHtml;
+            messagesDiv.scrollTop = messagesDiv.scrollHeight;
+        }
+        
+        // Subscribe to product updates
+        function subscribeToProduct() {
+            const productId = document.getElementById('productId').value;
+            
+            if (!productId) {
+                showNotification('Please enter a product ID', 'warning');
+                return;
+            }
+            
+            if (ws && ws.readyState === WebSocket.OPEN) {
+                ws.send(JSON.stringify({
+                    type: 'subscribe_product',
+                    data: {
+                        product_id: parseInt(productId)
+                    }
+                }));
+                showNotification(`Subscribed to product ${productId}`, 'success');
+            }
+        }
+        
+        // Display product trend
+        function displayProductTrend(data) {
+            const trendDiv = document.getElementById('trendResults');
+            
+            if (data.error) {
+                trendDiv.innerHTML = `<p style="color: #dc3545;">${data.error}</p>`;
+                return;
+            }
+            
+            const trendIcon = data.trend === 'improving' ? '📈' : 
+                            data.trend === 'declining' ? '📉' : '➡️';
+            
+            trendDiv.innerHTML = `
+                <div class="result-item">
+                    <h4>Product #${data.product_id} Sentiment Trend ${trendIcon}</h4>
+                    <div style="margin: 20px 0;">
+                        <div style="margin-bottom: 10px;">
+                            <strong>Positive:</strong> ${data.positive_percentage.toFixed(1)}%
+                            <div style="background: #e9ecef; border-radius: 5px; height: 20px; margin-top: 5px;">
+                                <div style="background: #28a745; width: ${data.positive_percentage}%; height: 100%; border-radius: 5px;"></div>
+                            </div>
+                        </div>
+                        <div style="margin-bottom: 10px;">
+                            <strong>Neutral:</strong> ${data.neutral_percentage.toFixed(1)}%
+                            <div style="background: #e9ecef; border-radius: 5px; height: 20px; margin-top: 5px;">
+                                <div style="background: #ffc107; width: ${data.neutral_percentage}%; height: 100%; border-radius: 5px;"></div>
+                            </div>
+                        </div>
+                        <div style="margin-bottom: 10px;">
+                            <strong>Negative:</strong> ${data.negative_percentage.toFixed(1)}%
+                            <div style="background: #e9ecef; border-radius: 5px; height: 20px; margin-top: 5px;">
+                                <div style="background: #dc3545; width: ${data.negative_percentage}%; height: 100%; border-radius: 5px;"></div>
+                            </div>
+                        </div>
+                    </div>
+                    <p>Total Reviews Analyzed: ${data.total_analyzed}</p>
+                    <p>Trend Direction: <strong>${data.trend}</strong></p>
+                </div>
+            `;
+        }
+        
+        // Update system stats
+        function updateSystemStats(data) {
+            document.getElementById('connectedClients').textContent = data.connected_clients || 0;
+            document.getElementById('activeRooms').textContent = data.active_rooms || 0;
+            document.getElementById('modelVersion').textContent = data.model_version || '-';
+            
+            document.getElementById('statsInfo').textContent = 
+                `Connected clients: ${data.connected_clients} | Active rooms: ${data.active_rooms}`;
+        }
+        
+        // Show notification
+        function showNotification(message, type = 'info') {
+            const notification = document.createElement('div');
+            notification.className = 'notification';
+            notification.innerHTML = `
+                <div style="display: flex; align-items: center; gap: 10px;">
+                    <span style="font-size: 24px;">
+                        ${type === 'success' ? '✅' : type === 'error' ? '❌' : type === 'warning' ? '⚠️' : 'ℹ️'}
+                    </span>
+                    <div>
+                        <strong>${type.charAt(0).toUpperCase() + type.slice(1)}</strong>
+                        <div>${message}</div>
+                    </div>
+                </div>
+            `;
+            document.body.appendChild(notification);
+            
+            setTimeout(() => {
+                notification.style.animation = 'slideInRight 0.5s reverse';
+                setTimeout(() => {
+                    notification.remove();
+                }, 500);
+            }, 3000);
+        }
+        
+        // Initialize on page load
+        window.onload = function() {
+            initWebSocket();
+        };
+    </script>
+</body>
+</html>

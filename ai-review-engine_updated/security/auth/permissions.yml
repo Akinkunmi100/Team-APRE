@@ -1,0 +1,155 @@
+# Permissions Configuration
+
+# Resource-based permissions
+resources:
+  users:
+    - create
+    - read
+    - update
+    - delete
+    - list
+  reports:
+    - create
+    - read
+    - update
+    - delete
+    - export
+  analytics:
+    - view
+    - export
+    - schedule
+  settings:
+    - read
+    - update
+  system:
+    - admin
+    - monitor
+    - backup
+
+# Role definitions
+roles:
+  admin:
+    description: "System administrator with full access"
+    permissions:
+      - "users.*"
+      - "reports.*"
+      - "analytics.*"
+      - "settings.*"
+      - "system.*"
+
+  manager:
+    description: "Team manager with user management and reporting capabilities"
+    permissions:
+      - "users.read"
+      - "users.update"
+      - "reports.*"
+      - "analytics.*"
+      - "settings.read"
+
+  analyst:
+    description: "Data analyst with focus on analytics and reporting"
+    permissions:
+      - "reports.read"
+      - "reports.create"
+      - "reports.export"
+      - "analytics.*"
+      - "settings.read"
+
+  user:
+    description: "Regular user with basic access"
+    permissions:
+      - "reports.read"
+      - "analytics.view"
+      - "settings.read"
+
+# Special permissions
+special_permissions:
+  backup_access:
+    description: "Access to backup functionality"
+    roles:
+      - admin
+  sensitive_data:
+    description: "Access to sensitive data"
+    roles:
+      - admin
+      - manager
+
+# Permission inheritance
+inheritance:
+  manager:
+    - user
+  admin:
+    - manager
+    - analyst
+
+# API endpoint permissions
+api_endpoints:
+  "/api/v1/users":
+    GET:
+      - admin
+      - manager
+    POST:
+      - admin
+    PUT:
+      - admin
+      - manager
+    DELETE:
+      - admin
+
+  "/api/v1/reports":
+    GET:
+      - admin
+      - manager
+      - analyst
+      - user
+    POST:
+      - admin
+      - manager
+      - analyst
+    DELETE:
+      - admin
+      - manager
+
+  "/api/v1/analytics":
+    GET:
+      - admin
+      - manager
+      - analyst
+    POST:
+      - admin
+      - analyst
+
+  "/api/v1/settings":
+    GET:
+      - admin
+      - manager
+    PUT:
+      - admin
+
+# Feature flags with permission requirements
+feature_flags:
+  advanced_analytics:
+    enabled: true
+    required_permissions:
+      - "analytics.view"
+  export_data:
+    enabled: true
+    required_permissions:
+      - "reports.export"
+  system_admin:
+    enabled: true
+    required_permissions:
+      - "system.admin"
+
+# Audit logging configuration
+audit_logging:
+  enabled: true
+  log_actions:
+    - user.login
+    - user.logout
+    - permission.granted
+    - permission.denied
+    - role.changed
+  excluded_paths:
+    - "/api/v1/health"
+    - "/api/v1/metrics"

@@ -1,0 +1,34 @@
+# Development Configuration
+
+application:
+  debug: true
+  secret_key: dev_secret_key_change_this
+
+database:
+  host: localhost
+  name: ai_review_engine_dev
+  user: postgres
+  password: postgres
+
+redis:
+  host: localhost
+
+api:
+  cors_origins: ["http://localhost:*"]
+  rate_limit:
+    enabled: false
+
+web:
+  templates_auto_reload: true
+
+security:
+  ssl_enabled: false
+  allowed_hosts: ["localhost", "127.0.0.1"]
+  csrf_enabled: true
+  session_secure: false
+
+logging:
+  level: DEBUG
+
+monitoring:
+  enabled: true

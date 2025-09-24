@@ -1,0 +1,1074 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>🚀 Ultimate AI Phone Review Engine - Dashboard</title>
+    <style>
+        body {
+            font-family: "Inter", "Segoe UI", -apple-system, BlinkMacSystemFont, sans-serif;
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 50%, #f093fb 100%);
+            margin: 0; 
+            padding: 0;
+            color: #333;
+            position: relative;
+            overflow-x: hidden;
+        }
+        
+        /* Animated background particles */
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(circle at 20% 50%, rgba(120,119,198,0.1) 0%, transparent 50%),
+                        radial-gradient(circle at 80% 20%, rgba(255,119,198,0.1) 0%, transparent 50%),
+                        radial-gradient(circle at 40% 80%, rgba(120,219,255,0.1) 0%, transparent 50%);
+            animation: backgroundFloat 20s ease-in-out infinite;
+            z-index: -1;
+        }
+        
+        @keyframes backgroundFloat {
+            0%, 100% { opacity: 0.6; }
+            50% { opacity: 0.8; }
+        }
+        
+        .ultimate-header {
+            background: linear-gradient(135deg, rgba(255,107,107,0.95) 0%, rgba(78,205,196,0.95) 50%, rgba(69,183,209,0.95) 100%);
+            backdrop-filter: blur(25px);
+            padding: 2.5rem;
+            border-radius: 25px;
+            margin: 2rem;
+            margin-bottom: 2rem;
+            color: white;
+            text-align: center;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.15), 0 0 0 1px rgba(255,255,255,0.2);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .ultimate-header::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(255,255,255,0.1) 1px, transparent 1px);
+            background-size: 30px 30px;
+            animation: headerFloat 15s linear infinite;
+        }
+        
+        @keyframes headerFloat {
+            0% { transform: translate(0, 0) rotate(0deg); }
+            100% { transform: translate(-30px, -30px) rotate(360deg); }
+        }
+        
+        .ultimate-header h1 {
+            font-size: 3.5rem;
+            margin: 0;
+            font-weight: 800;
+            text-shadow: 0 4px 20px rgba(0,0,0,0.3);
+            position: relative;
+            z-index: 2;
+        }
+        
+        .ultimate-header p {
+            font-size: 1.3rem;
+            margin: 0.8rem 0 0 0;
+            opacity: 0.95;
+            position: relative;
+            z-index: 2;
+        }
+        
+        .user-tag {
+            margin-top: 1.5rem;
+            padding: 0.8rem 1.5rem;
+            border-radius: 25px;
+            background: linear-gradient(135deg, rgba(255,255,255,0.25), rgba(255,255,255,0.1));
+            backdrop-filter: blur(15px);
+            font-weight: bold;
+            display: inline-block;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            border: 1px solid rgba(255,255,255,0.3);
+            position: relative;
+            z-index: 2;
+        }
+
+        /* Sidebar */
+        .sidebar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            height: 100vh;
+            width: 300px;
+            background: linear-gradient(135deg, rgba(255,255,255,0.95), rgba(248,250,255,0.95));
+            backdrop-filter: blur(25px);
+            border-right: 1px solid rgba(255,255,255,0.2);
+            box-shadow: 5px 0 25px rgba(0,0,0,0.1);
+            padding: 2rem 1.8rem;
+            overflow-y: auto;
+            z-index: 1000;
+        }
+        
+        .sidebar h3 {
+            margin-top: 0;
+            color: #333;
+        }
+        
+        .sidebar button {
+            width: 100%;
+            margin: 0.5rem 0;
+            padding: 1rem 1.2rem;
+            border: none;
+            background: linear-gradient(135deg, #4285f4, #5a67d8);
+            color: white;
+            font-size: 1rem;
+            font-weight: 600;
+            border-radius: 15px;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            box-shadow: 0 4px 12px rgba(66, 133, 244, 0.25);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .sidebar button::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+            transition: left 0.5s;
+        }
+        
+        .sidebar button:hover {
+            background: linear-gradient(135deg, #3367d6, #4c51bf);
+            transform: translateY(-2px) scale(1.02);
+            box-shadow: 0 8px 20px rgba(66, 133, 244, 0.35);
+        }
+        
+        .sidebar button:hover::before {
+            left: 100%;
+        }
+        
+        .sidebar button.upgrade {
+            background: linear-gradient(135deg, #4caf50, #66bb6a);
+            box-shadow: 0 4px 12px rgba(76, 175, 80, 0.3);
+        }
+        
+        .sidebar button.upgrade:hover {
+            background: linear-gradient(135deg, #43a047, #4caf50);
+            box-shadow: 0 8px 20px rgba(76, 175, 80, 0.4);
+        }
+        
+        .sidebar .section {
+            margin: 2rem 0;
+        }
+        
+        .sidebar .metric {
+            margin-bottom: 0.8rem;
+        }
+        
+        .sidebar .metric-title {
+            font-weight: 600;
+            color: #666;
+        }
+        
+        .sidebar .metric-value {
+            font-size: 1.4rem;
+            color: #333;
+            font-weight: bold;
+        }
+        
+        .sidebar .info-box {
+            background: linear-gradient(135deg, rgba(238,243,253,0.9), rgba(230,235,255,0.9));
+            backdrop-filter: blur(15px);
+            color: #333;
+            padding: 1rem 1.2rem;
+            border-radius: 15px;
+            margin: 1.5rem 0;
+            font-size: 0.9rem;
+            border: 1px solid rgba(66,133,244,0.1);
+            box-shadow: 0 3px 10px rgba(0,0,0,0.05);
+        }
+
+        /* Main area */
+        .main-content {
+            margin-left: 320px;
+            padding: 2rem;
+            max-width: 1000px;
+        }
+        
+        .search-box {
+            display: flex;
+            margin-bottom: 2rem;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.12);
+            border-radius: 25px;
+            overflow: hidden;
+            backdrop-filter: blur(10px);
+        }
+        
+        .search-input {
+            flex: 1;
+            font-size: 1.3rem;
+            padding: 1.2rem 1.5rem;
+            border: none;
+            background: linear-gradient(135deg, rgba(255,255,255,0.9), rgba(248,250,255,0.9));
+            backdrop-filter: blur(15px);
+            outline: none;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            font-weight: 500;
+        }
+        
+        .search-input::placeholder {
+            color: rgba(102,102,102,0.7);
+        }
+        
+        .search-input:focus {
+            background: linear-gradient(135deg, rgba(255,255,255,0.95), rgba(240,245,255,0.95));
+            box-shadow: 0 0 0 3px rgba(66, 133, 244, 0.15);
+        }
+        
+        .search-button {
+            background: linear-gradient(135deg, #4285f4, #5a67d8);
+            border: none;
+            color: white;
+            font-weight: 700;
+            font-size: 1.3rem;
+            padding: 0 2rem;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .search-button::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+            transition: left 0.5s;
+        }
+        
+        .search-button:hover {
+            background: linear-gradient(135deg, #3367d6, #4c51bf);
+            transform: scale(1.02);
+            box-shadow: 0 5px 15px rgba(66, 133, 244, 0.4);
+        }
+        
+        .search-button:hover::before {
+            left: 100%;
+        }
+        
+        .result-card, .web-result-card {
+            background: linear-gradient(135deg, rgba(255,255,255,0.95), rgba(248,250,255,0.95));
+            backdrop-filter: blur(15px);
+            border-radius: 20px;
+            padding: 2rem;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.1);
+            margin-bottom: 1.5rem;
+            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            border: 1px solid rgba(255,255,255,0.3);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .result-card::before, .web-result-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(135deg, rgba(66,133,244,0.05), transparent);
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+        
+        .result-card:hover, .web-result-card:hover {
+            transform: translateY(-5px) scale(1.01);
+            box-shadow: 0 15px 40px rgba(66,133,244,0.15);
+            border-color: rgba(66,133,244,0.2);
+        }
+        
+        .result-card:hover::before, .web-result-card:hover::before {
+            opacity: 1;
+        }
+        
+        .web-result-card {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+        
+        .result-card h2, .web-result-card h2 {
+            margin-top: 0;
+            font-size: 1.5rem;
+        }
+        
+        .metrics-row {
+            display: flex;
+            justify-content: space-around;
+            margin: 1rem 0;
+        }
+        
+        .metrics-row .metric {
+            text-align: center;
+            flex: 1;
+        }
+        
+        .metrics-row .metric .metric-title {
+            font-weight: 600;
+            color: #666;
+            font-size: 0.9rem;
+        }
+        
+        .metrics-row .metric .metric-value {
+            font-size: 1.2rem;
+            font-weight: bold;
+            color: #333;
+        }
+        
+        .recommendations {
+            background: linear-gradient(135deg, rgba(132,250,176,0.9) 0%, rgba(143,211,244,0.9) 100%);
+            backdrop-filter: blur(15px);
+            color: white;
+            padding: 2rem;
+            border-radius: 25px;
+            margin-top: 2rem;
+            box-shadow: 0 10px 30px rgba(132,250,176,0.2);
+            border: 1px solid rgba(255,255,255,0.2);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .recommendations::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: radial-gradient(circle at 30% 30%, rgba(255,255,255,0.1) 0%, transparent 50%);
+        }
+        
+        .button-group {
+            margin-top: 1rem;
+        }
+        
+        .button-group button {
+            padding: 0.8rem 1.5rem;
+            font-size: 1rem;
+            font-weight: 600;
+            border-radius: 15px;
+            border: none;
+            cursor: pointer;
+            margin-right: 1rem;
+            margin-bottom: 0.8rem;
+            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .upgrade-button {
+            background: linear-gradient(135deg, #4CAF50, #66bb6a);
+            color: white;
+        }
+        
+        .upgrade-button:hover {
+            background: linear-gradient(135deg, #45a049, #4CAF50);
+            transform: translateY(-2px) scale(1.02);
+            box-shadow: 0 8px 20px rgba(76, 175, 80, 0.3);
+        }
+        
+        .cancel-button {
+            background-color: #f44336;
+            color: white;
+        }
+        
+        .cancel-button:hover {
+            background-color: #d32f2f;
+        }
+        
+        .search-suggestion {
+            background: linear-gradient(135deg, rgba(255,255,255,0.2), rgba(255,255,255,0.1));
+            backdrop-filter: blur(10px);
+            padding: 0.8rem 1.5rem;
+            border-radius: 25px;
+            margin: 0.5rem;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            border: 1px solid rgba(255,255,255,0.3);
+            font-weight: 500;
+            display: inline-block;
+        }
+        
+        .search-suggestion:hover {
+            background: linear-gradient(135deg, rgba(255,255,255,0.3), rgba(255,255,255,0.2));
+            transform: translateY(-2px) scale(1.02);
+            box-shadow: 0 5px 15px rgba(255,255,255,0.2);
+        }
+        
+        .sentiment-positive { color: #0f9d58; font-weight: bold; }
+        .sentiment-negative { color: #ea4335; font-weight: bold; }
+        .sentiment-neutral { color: #fbbc04; font-weight: bold; }
+        
+        .loading {
+            display: none;
+            text-align: center;
+            padding: 2rem;
+        }
+        
+        .spinner {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #3498db;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        .error-message {
+            background: #ffebee;
+            color: #c62828;
+            padding: 1rem;
+            border-radius: 8px;
+            margin: 1rem 0;
+            display: none;
+        }
+        
+        .success-message {
+            background: #e8f5e9;
+            color: #2e7d32;
+            padding: 1rem;
+            border-radius: 8px;
+            margin: 1rem 0;
+            display: none;
+        }
+
+        @media (max-width: 768px) {
+            .sidebar {
+                transform: translateX(-100%);
+                transition: transform 0.3s;
+            }
+            
+            .sidebar.open {
+                transform: translateX(0);
+            }
+            
+            .main-content {
+                margin-left: 0;
+                padding: 1rem;
+            }
+            
+            .ultimate-header {
+                margin-bottom: 1rem;
+            }
+            
+            .ultimate-header h1 {
+                font-size: 2rem;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<div class="ultimate-header">
+    <h1>🚀 Ultimate AI Phone Review Engine</h1>
+    <p>Professional phone market intelligence & analytics</p>
+    <div class="user-tag">🏢 {{ user_stats.plan_name }} Plan Active</div>
+</div>
+
+<div class="sidebar">
+    <h3>👤 User: {{ user.username }}</h3>
+    <div class="section">
+        <div class="metric">
+            <div class="metric-title">Searches Today</div>
+            <div class="metric-value">{{ user_stats.searches_today }} <small style="font-weight: normal;">({{ user_stats.searches_left }} left)</small></div>
+        </div>
+        <div class="metric">
+            <div class="metric-title">API Calls</div>
+            <div class="metric-value">{{ user_stats.api_calls_today }}</div>
+        </div>
+        <div class="metric">
+            <div class="metric-title">Reports Generated</div>
+            <div class="metric-value">{{ user_stats.reports_generated }}</div>
+        </div>
+    </div>
+    
+    <div class="section">
+        <button onclick="goToLanding()">🏠 Back to Home</button>
+        {% if plan_config.bulk_search %}
+        <button onclick="enableBulkSearch()">🔍 Bulk Search</button>
+        {% endif %}
+        {% if plan_config.competitor_analysis %}
+        <button onclick="showCompetitorAnalysis()">🏆 Competitor Analysis</button>
+        {% endif %}
+        {% if plan_config.analytics %}
+        <button onclick="showUsageAnalytics()">📈 Usage Analytics</button>
+        {% endif %}
+        {% if plan_config.custom_reports %}
+        <button onclick="generateCustomReport()">📋 Custom Reports</button>
+        {% endif %}
+        {% if not user.is_business_user() %}
+        <button class="upgrade" onclick="showUpgradeModal()">⭐ Upgrade to Business</button>
+        {% endif %}
+        <button onclick="logout()">🚪 Logout</button>
+    </div>
+
+    {% if user_stats.next_billing %}
+    <div class="section info-box">
+        📅 Next Billing: {{ user_stats.next_billing }}<br />
+        💳 Payment Method: {{ user.payment_method }}
+    </div>
+    {% endif %}
+</div>
+
+<div class="main-content">
+    <div class="search-box">
+        <input class="search-input" type="text" id="searchQuery" placeholder="Search any phone model - iPhone 15, Galaxy S24, Pixel 8..." />
+        <button class="search-button" onclick="performSearch()">🚀 Ultimate Search</button>
+    </div>
+    
+    <div class="error-message" id="errorMessage"></div>
+    <div class="success-message" id="successMessage"></div>
+    
+    <div class="loading" id="loadingIndicator">
+        <div class="spinner"></div>
+        <p>Analyzing phone data...</p>
+    </div>
+
+    <div id="searchResults"></div>
+
+    <div class="recommendations">
+        <h3>🎯 Smart Search Suggestions</h3>
+        <div class="button-group">
+            <div class="search-suggestion" onclick="searchFor('Samsung Galaxy S24')">🔍 Samsung Galaxy S24</div>
+            <div class="search-suggestion" onclick="searchFor('iPhone 15 Pro Max')">🔍 iPhone 15 Pro Max</div>
+            <div class="search-suggestion" onclick="searchFor('Google Pixel 8')">🔍 Google Pixel 8</div>
+            <div class="search-suggestion" onclick="searchFor('OnePlus 12')">🔍 OnePlus 12</div>
+        </div>
+        <p>💡 Pro tip: Use our advanced analytics to compare multiple phones and find the best match for your needs!</p>
+    </div>
+</div>
+
+<script>
+// Global variables
+let currentUser = {
+    plan: '{{ user.plan_type }}',
+    searchesLeft: {{ user_stats.searches_left }},
+    hasBusinessFeatures: {{ user.is_business_user()|lower }}
+};
+
+// Search functionality
+function performSearch(searchType = 'single') {
+    const query = document.getElementById('searchQuery').value.trim();
+    if (!query) {
+        showError('Please enter a search query');
+        return;
+    }
+    
+    showLoading(true);
+    hideMessages();
+    
+    const url = `/api/search?q=${encodeURIComponent(query)}&type=${searchType}`;
+    
+    fetch(url, {
+        method: 'GET',
+        headers: {
+            'Content-Type': 'application/json'
+        }
+    })
+    .then(response => response.json())
+    .then(data => {
+        showLoading(false);
+        if (data.error) {
+            showError(data.error);
+            if (data.upgrade_needed) {
+                setTimeout(() => showUpgradeModal(), 2000);
+            }
+        } else {
+            displaySearchResults(data);
+            updateUserStats(data);
+        }
+    })
+    .catch(error => {
+        showLoading(false);
+        showError('Search failed: ' + error.message);
+    });
+}
+
+function searchFor(query) {
+    document.getElementById('searchQuery').value = query;
+    performSearch();
+}
+
+function displaySearchResults(data) {
+    const resultsContainer = document.getElementById('searchResults');
+    resultsContainer.innerHTML = '';
+    
+    if (!data.results || data.results.length === 0) {
+        resultsContainer.innerHTML = '<div class="result-card"><h2>No Results Found</h2><p>Try a different search term or check the spelling.</p></div>';
+        return;
+    }
+    
+    // Group results by product
+    const groupedResults = {};
+    data.results.forEach(result => {
+        const key = result.product || 'Unknown Phone';
+        if (!groupedResults[key]) {
+            groupedResults[key] = [];
+        }
+        groupedResults[key].push(result);
+    });
+    
+    // Display grouped results
+    Object.keys(groupedResults).forEach(productName => {
+        const productResults = groupedResults[productName];
+        const firstResult = productResults[0];
+        
+        // Calculate aggregate metrics
+        const totalReviews = productResults.length;
+        const ratingsWithValues = productResults.filter(r => r.rating && !isNaN(r.rating));
+        const avgRating = ratingsWithValues.length > 0 
+            ? (ratingsWithValues.reduce((sum, r) => sum + parseFloat(r.rating), 0) / ratingsWithValues.length).toFixed(1)
+            : 'N/A';
+        
+        const sentiments = productResults.map(r => r.sentiment);
+        const positivePct = ((sentiments.filter(s => s && s.label === 'positive').length / totalReviews) * 100).toFixed(1);
+        
+        const recommendationScore = avgRating !== 'N/A' 
+            ? Math.min(95, (parseFloat(positivePct) * 0.6) + (parseFloat(avgRating) * 15) + 10).toFixed(1)
+            : (parseFloat(positivePct) * 0.8 + 50).toFixed(1);
+        
+        const resultCard = `
+            <div class="result-card">
+                <h2>${productName}</h2>
+                <p><strong>Brand:</strong> ${firstResult.brand || 'Unknown'}</p>
+                <p><strong>Rating:</strong> ${avgRating === 'N/A' ? 'N/A' : avgRating + ' ⭐'}</p>
+                <div class="metrics-row">
+                    <div class="metric">
+                        <div class="metric-title">Reviews</div>
+                        <div class="metric-value">${totalReviews}</div>
+                    </div>
+                    <div class="metric">
+                        <div class="metric-title">Positive Sentiment</div>
+                        <div class="metric-value">${positivePct}%</div>
+                    </div>
+                    <div class="metric">
+                        <div class="metric-title">Recommendation Score</div>
+                        <div class="metric-value">${recommendationScore}%</div>
+                    </div>
+                </div>
+                <button onclick="getPhoneAnalytics('${productName}')" class="upgrade-button" style="margin-top: 1rem;">📊 Detailed Analytics</button>
+            </div>
+        `;
+        
+        resultsContainer.innerHTML += resultCard;
+        
+        // Add sample reviews
+        if (productResults.length > 0) {
+            const reviewsCard = `
+                <div class="web-result-card">
+                    <h2>Recent User Reviews</h2>
+                    ${productResults.slice(0, 3).map(review => {
+                        const sentimentClass = review.sentiment && review.sentiment.label ? `sentiment-${review.sentiment.label}` : 'sentiment-neutral';
+                        const sentimentEmoji = review.sentiment && review.sentiment.label === 'positive' ? '😊' : 
+                                             review.sentiment && review.sentiment.label === 'negative' ? '😞' : '😐';
+                        const sentimentText = review.sentiment && review.sentiment.label ? review.sentiment.label.charAt(0).toUpperCase() + review.sentiment.label.slice(1) : 'Neutral';
+                        
+                        return `
+                            <p><em>User Review</em>: "${review.review_text}" <span class="${sentimentClass}">${sentimentEmoji} ${sentimentText}</span></p>
+                        `;
+                    }).join('')}
+                </div>
+            `;
+            resultsContainer.innerHTML += reviewsCard;
+        }
+    });
+    
+    // Add execution info
+    const infoCard = `
+        <div class="result-card" style="background: #f8f9fa; border-left: 4px solid #4285f4;">
+            <h3>🔍 Search Results Summary</h3>
+            <p><strong>Total Results:</strong> ${data.total}</p>
+            <p><strong>Execution Time:</strong> ${data.execution_time}s</p>
+            <p><strong>Search Type:</strong> ${data.search_type.charAt(0).toUpperCase() + data.search_type.slice(1)}</p>
+            <p><strong>Searches Remaining:</strong> ${data.searches_left}</p>
+        </div>
+    `;
+    resultsContainer.innerHTML += infoCard;
+}
+
+// Business features
+function enableBulkSearch() {
+    if (!currentUser.hasBusinessFeatures) {
+        showUpgradeModal();
+        return;
+    }
+    
+    const query = prompt('Enter multiple phone models separated by commas:\n\nExample: iPhone 15, Galaxy S24, Pixel 8');
+    if (query) {
+        document.getElementById('searchQuery').value = query;
+        performSearch('bulk');
+    }
+}
+
+function showCompetitorAnalysis() {
+    if (!currentUser.hasBusinessFeatures) {
+        showUpgradeModal();
+        return;
+    }
+    
+    const models = prompt('Enter phone models to compare (2-5 models, separated by commas):\n\nExample: iPhone 15 Pro, Galaxy S24 Ultra, Pixel 8 Pro');
+    if (models) {
+        const modelList = models.split(',').map(m => m.trim()).filter(m => m);
+        if (modelList.length < 2) {
+            showError('Please enter at least 2 phone models for comparison');
+            return;
+        }
+        
+        showLoading(true);
+        const url = `/api/business/competitor-analysis?${modelList.map(m => `models=${encodeURIComponent(m)}`).join('&')}`;
+        
+        fetch(url)
+        .then(response => response.json())
+        .then(data => {
+            showLoading(false);
+            if (data.error) {
+                showError(data.error);
+            } else {
+                displayCompetitorAnalysis(data);
+            }
+        })
+        .catch(error => {
+            showLoading(false);
+            showError('Competitor analysis failed: ' + error.message);
+        });
+    }
+}
+
+function getPhoneAnalytics(phoneName) {
+    showLoading(true);
+    
+    fetch(`/api/phone/${encodeURIComponent(phoneName)}/analytics`)
+    .then(response => response.json())
+    .then(data => {
+        showLoading(false);
+        if (data.error) {
+            showError(data.error);
+        } else {
+            displayPhoneAnalytics(data);
+        }
+    })
+    .catch(error => {
+        showLoading(false);
+        showError('Analytics failed: ' + error.message);
+    });
+}
+
+function displayPhoneAnalytics(data) {
+    const analyticsHTML = `
+        <div class="result-card" style="border: 2px solid #4285f4;">
+            <h2>📊 Complete Analytics: ${data.phone_name}</h2>
+            <div class="metrics-row">
+                <div class="metric">
+                    <div class="metric-title">Total Reviews</div>
+                    <div class="metric-value">${data.total_reviews}</div>
+                </div>
+                <div class="metric">
+                    <div class="metric-title">Average Rating</div>
+                    <div class="metric-value">${data.avg_rating} ⭐</div>
+                </div>
+                <div class="metric">
+                    <div class="metric-title">Recommendation Score</div>
+                    <div class="metric-value">${data.recommendation_score}%</div>
+                </div>
+            </div>
+            
+            <h3>📈 Sentiment Analysis</h3>
+            <div class="metrics-row">
+                <div class="metric">
+                    <div class="metric-title sentiment-positive">Positive</div>
+                    <div class="metric-value">${data.sentiment.positive}%</div>
+                </div>
+                <div class="metric">
+                    <div class="metric-title sentiment-neutral">Neutral</div>
+                    <div class="metric-value">${data.sentiment.neutral}%</div>
+                </div>
+                <div class="metric">
+                    <div class="metric-title sentiment-negative">Negative</div>
+                    <div class="metric-value">${data.sentiment.negative}%</div>
+                </div>
+            </div>
+            
+            <h3>🎯 Key Features</h3>
+            <p>${data.key_features.join(', ')}</p>
+            
+            <div style="display: flex; gap: 2rem; margin-top: 1rem;">
+                <div style="flex: 1;">
+                    <h4 style="color: #4caf50;">✅ Pros</h4>
+                    <ul>
+                        ${data.pros_cons.pros.map(pro => `<li>${pro}</li>`).join('')}
+                    </ul>
+                </div>
+                <div style="flex: 1;">
+                    <h4 style="color: #f44336;">❌ Cons</h4>
+                    <ul>
+                        ${data.pros_cons.cons.map(con => `<li>${con}</li>`).join('')}
+                    </ul>
+                </div>
+            </div>
+        </div>
+    `;
+    
+    document.getElementById('searchResults').innerHTML = analyticsHTML + document.getElementById('searchResults').innerHTML;
+}
+
+function displayCompetitorAnalysis(data) {
+    let comparisonHTML = '<div class="result-card" style="border: 2px solid #ff9800;"><h2>🏆 Competitor Analysis</h2>';
+    
+    // Summary
+    if (data.comparison_data.summary) {
+        comparisonHTML += `
+            <div class="metrics-row">
+                <div class="metric">
+                    <div class="metric-title">Models Compared</div>
+                    <div class="metric-value">${data.comparison_data.summary.total_compared}</div>
+                </div>
+                <div class="metric">
+                    <div class="metric-title">Winner</div>
+                    <div class="metric-value">${data.comparison_data.summary.winner || 'N/A'}</div>
+                </div>
+                <div class="metric">
+                    <div class="metric-title">Best Rating</div>
+                    <div class="metric-value">${data.comparison_data.summary.best_rating || 'N/A'}</div>
+                </div>
+            </div>
+        `;
+    }
+    
+    // Detailed comparison
+    comparisonHTML += '<h3>📊 Detailed Comparison</h3>';
+    Object.entries(data.comparison_data.comparison).forEach(([model, analytics]) => {
+        comparisonHTML += `
+            <div style="background: #f8f9fa; padding: 1rem; margin: 0.5rem 0; border-radius: 8px;">
+                <h4>${model}</h4>
+                <div class="metrics-row">
+                    <div class="metric">
+                        <div class="metric-title">Rating</div>
+                        <div class="metric-value">${analytics.avg_rating} ⭐</div>
+                    </div>
+                    <div class="metric">
+                        <div class="metric-title">Reviews</div>
+                        <div class="metric-value">${analytics.total_reviews}</div>
+                    </div>
+                    <div class="metric">
+                        <div class="metric-title">Positive Sentiment</div>
+                        <div class="metric-value">${analytics.sentiment.positive}%</div>
+                    </div>
+                    <div class="metric">
+                        <div class="metric-title">Recommendation</div>
+                        <div class="metric-value">${analytics.recommendation_score}%</div>
+                    </div>
+                </div>
+            </div>
+        `;
+    });
+    
+    comparisonHTML += '</div>';
+    document.getElementById('searchResults').innerHTML = comparisonHTML + document.getElementById('searchResults').innerHTML;
+}
+
+// Utility functions
+function showLoading(show) {
+    document.getElementById('loadingIndicator').style.display = show ? 'block' : 'none';
+}
+
+function showError(message) {
+    const errorEl = document.getElementById('errorMessage');
+    errorEl.textContent = message;
+    errorEl.style.display = 'block';
+}
+
+function showSuccess(message) {
+    const successEl = document.getElementById('successMessage');
+    successEl.textContent = message;
+    successEl.style.display = 'block';
+}
+
+function hideMessages() {
+    document.getElementById('errorMessage').style.display = 'none';
+    document.getElementById('successMessage').style.display = 'none';
+}
+
+function updateUserStats(data) {
+    if (data.searches_left !== undefined) {
+        currentUser.searchesLeft = data.searches_left;
+        // Update sidebar display
+        document.querySelector('.sidebar .metric-value').innerHTML = 
+            `${data.search_type === 'single' ? 1 : 0} <small style="font-weight: normal;">(${data.searches_left} left)</small>`;
+    }
+}
+
+function showUpgradeModal() {
+    const upgrade = confirm(
+        '🚀 Upgrade to Business Plan?\n\n' +
+        '✅ 200 searches per day\n' +
+        '✅ Bulk search capabilities\n' +
+        '✅ Competitor analysis\n' +
+        '✅ Custom reports\n' +
+        '✅ Advanced analytics\n' +
+        '✅ Priority support\n\n' +
+        'Click OK to learn more about upgrading!'
+    );
+    
+    if (upgrade) {
+        // In a real app, this would redirect to a payment page
+        showSuccess('Upgrade feature coming soon! Contact support for business plans.');
+    }
+}
+
+function generateCustomReport() {
+    if (!currentUser.hasBusinessFeatures) {
+        showUpgradeModal();
+        return;
+    }
+    
+    const reportType = prompt('Enter report type:\n\n1. summary - Market overview\n2. detailed - Comprehensive analysis\n\nEnter "summary" or "detailed":');
+    if (reportType && ['summary', 'detailed'].includes(reportType.toLowerCase())) {
+        showLoading(true);
+        
+        fetch(`/api/business/custom-report?type=${reportType.toLowerCase()}`)
+        .then(response => response.json())
+        .then(data => {
+            showLoading(false);
+            if (data.error) {
+                showError(data.error);
+            } else {
+                showSuccess(`${reportType.charAt(0).toUpperCase() + reportType.slice(1)} report generated successfully!`);
+                console.log('Report data:', data); // In real app, would display formatted report
+            }
+        })
+        .catch(error => {
+            showLoading(false);
+            showError('Report generation failed: ' + error.message);
+        });
+    }
+}
+
+function showUsageAnalytics() {
+    if (!currentUser.hasBusinessFeatures) {
+        showUpgradeModal();
+        return;
+    }
+    
+    showLoading(true);
+    
+    fetch('/api/business/usage-analytics')
+    .then(response => response.json())
+    .then(data => {
+        showLoading(false);
+        if (data.error) {
+            showError(data.error);
+        } else {
+            displayUsageAnalytics(data);
+        }
+    })
+    .catch(error => {
+        showLoading(false);
+        showError('Analytics failed: ' + error.message);
+    });
+}
+
+function displayUsageAnalytics(data) {
+    const analyticsHTML = `
+        <div class="result-card" style="border: 2px solid #9c27b0;">
+            <h2>📈 Usage Analytics</h2>
+            <div class="metrics-row">
+                <div class="metric">
+                    <div class="metric-title">Total Searches</div>
+                    <div class="metric-value">${data.total_searches}</div>
+                </div>
+                <div class="metric">
+                    <div class="metric-title">Avg Execution Time</div>
+                    <div class="metric-value">${data.avg_execution_time.toFixed(2)}s</div>
+                </div>
+            </div>
+            
+            <h3>🔍 Search Types</h3>
+            <div class="metrics-row">
+                ${Object.entries(data.search_types).map(([type, count]) => `
+                    <div class="metric">
+                        <div class="metric-title">${type.charAt(0).toUpperCase() + type.slice(1)}</div>
+                        <div class="metric-value">${count}</div>
+                    </div>
+                `).join('')}
+            </div>
+            
+            <h3>🎯 Top Queries</h3>
+            ${data.top_queries.slice(0, 5).map(query => `
+                <p>• <strong>${query.query}</strong> (${query.results} results, ${query.time.toFixed(2)}s)</p>
+            `).join('')}
+        </div>
+    `;
+    
+    document.getElementById('searchResults').innerHTML = analyticsHTML + document.getElementById('searchResults').innerHTML;
+}
+
+function logout() {
+    if (confirm('Are you sure you want to logout?')) {
+        window.location.href = '/logout';
+    }
+}
+
+function goToLanding() {
+    window.location.href = '/';
+}
+
+// Event listeners
+document.getElementById('searchQuery').addEventListener('keypress', function(e) {
+    if (e.key === 'Enter') {
+        performSearch();
+    }
+});
+
+// Mobile menu toggle (for responsive design)
+function toggleMobileMenu() {
+    document.querySelector('.sidebar').classList.toggle('open');
+}
+
+// Initialize page
+document.addEventListener('DOMContentLoaded', function() {
+    hideMessages();
+    
+    // Auto-focus search input
+    document.getElementById('searchQuery').focus();
+    
+    // Add mobile menu button for small screens
+    if (window.innerWidth <= 768) {
+        const menuButton = document.createElement('button');
+        menuButton.innerHTML = '☰ Menu';
+        menuButton.style.cssText = 'position: fixed; top: 1rem; left: 1rem; z-index: 1001; padding: 0.5rem; background: #4285f4; color: white; border: none; border-radius: 4px; cursor: pointer;';
+        menuButton.onclick = toggleMobileMenu;
+        document.body.appendChild(menuButton);
+    }
+});
+</script>
+
+</body>
+</html>

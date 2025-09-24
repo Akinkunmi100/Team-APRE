@@ -1,0 +1,72 @@
+# Authentication Configuration
+
+oauth2:
+  providers:
+    google:
+      client_id: ${GOOGLE_CLIENT_ID}
+      client_secret: ${GOOGLE_CLIENT_SECRET}
+      redirect_uri: "/auth/google/callback"
+      scope: ["openid", "email", "profile"]
+    github:
+      client_id: ${GITHUB_CLIENT_ID}
+      client_secret: ${GITHUB_CLIENT_SECRET}
+      redirect_uri: "/auth/github/callback"
+      scope: ["user:email"]
+
+jwt:
+  secret_key: ${JWT_SECRET_KEY}
+  algorithm: "HS256"
+  access_token_expire_minutes: 30
+  refresh_token_expire_days: 7
+
+password:
+  min_length: 12
+  require_uppercase: true
+  require_lowercase: true
+  require_numbers: true
+  require_special: true
+  max_login_attempts: 5
+  lockout_duration: 300  # 5 minutes
+
+session:
+  cookie_name: "session_id"
+  cookie_secure: true
+  cookie_httponly: true
+  cookie_samesite: "Lax"
+  lifetime: 3600  # 1 hour
+
+mfa:
+  enabled: true
+  issuer: "AI Review Engine"
+  digits: 6
+  interval: 30
+  backup_codes: 10
+
+rate_limiting:
+  login:
+    rate: 5
+    per: 300  # 5 attempts per 5 minutes
+  password_reset:
+    rate: 3
+    per: 3600  # 3 attempts per hour
+  api:
+    rate: 100
+    per: 3600  # 100 requests per hour
+
+permissions:
+  roles:
+    admin:
+      - "user:create"
+      - "user:read"
+      - "user:update"
+      - "user:delete"
+      - "system:admin"
+    manager:
+      - "user:read"
+      - "user:update"
+      - "reports:create"
+      - "reports:read"
+    user:
+      - "user:read"
+      - "reports:read"
+  default_role: "user"

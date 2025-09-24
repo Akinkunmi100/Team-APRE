@@ -1,0 +1,71 @@
+# Default Configuration
+
+application:
+  name: AI Review Engine
+  version: 1.0.0
+  debug: false
+  secret_key: change_this_in_production
+
+database:
+  type: postgresql
+  port: 5432
+  pool_size: 5
+  max_overflow: 10
+  pool_timeout: 30
+  pool_recycle: 3600
+
+redis:
+  port: 6379
+  db: 0
+  max_connections: 10
+  socket_timeout: 5
+
+api:
+  host: 0.0.0.0
+  port: 8000
+  workers: 4
+  timeout: 60
+  cors_origins: ["*"]
+  rate_limit:
+    enabled: true
+    default_limit: 100
+    period: 3600
+
+web:
+  host: 0.0.0.0
+  port: 5000
+  session_lifetime: 3600
+  templates_auto_reload: false
+
+dashboard:
+  host: 0.0.0.0
+  port: 8501
+  theme:
+    primaryColor: "#FF4B4B"
+    backgroundColor: "#FFFFFF"
+    secondaryBackgroundColor: "#F0F2F6"
+
+worker:
+  concurrency: 4
+  max_tasks_per_child: 100
+  task_timeout: 3600
+  retry_delay: 300
+  max_retries: 3
+
+logging:
+  level: INFO
+  format: "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
+  file_size: 10485760  # 10MB
+  backup_count: 5
+
+security:
+  ssl_enabled: false
+  allowed_hosts: ["*"]
+  csrf_enabled: true
+  password_hash_method: "pbkdf2:sha256:150000"
+  session_secure: false
+
+monitoring:
+  enabled: true
+  metrics_path: "/metrics"
+  collection_interval: 15

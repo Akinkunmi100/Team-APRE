@@ -1,0 +1,6 @@
+analysis_id,product_id,total_reviews_analyzed,positive_percentage,neutral_percentage,negative_percentage,average_rating,top_positive_aspects,top_negative_aspects,fake_review_percentage,summary
+1,1,3456,78.5,15.2,6.3,4.7,"[""camera"", ""display"", ""performance"", ""battery_life""]","[""price"", ""no_charger""]",3.2,iPhone 15 Pro Max receives overwhelmingly positive reviews with praise for camera and performance.
+2,2,2890,75.3,17.8,6.9,4.6,"[""camera"", ""s_pen"", ""display"", ""features""]","[""battery_life"", ""price"", ""size""]",4.1,"Galaxy S24 Ultra praised for versatility and S Pen, but some concerns about battery life."
+3,3,1567,72.1,18.4,9.5,4.5,"[""ai_features"", ""camera"", ""software"", ""updates""]","[""heating"", ""battery_life"", ""tensor_chip""]",2.8,Pixel 8 Pro excels in AI and photography but faces criticism for Tensor G3 heating issues.
+4,4,892,74.8,19.1,6.1,4.4,"[""value"", ""performance"", ""charging_speed"", ""display""]","[""camera"", ""software_updates""]",3.5,"OnePlus 12 offers excellent value with top performance, though camera lags behind competitors."
+5,5,1234,68.9,21.3,9.8,4.3,"[""camera"", ""build_quality"", ""value"", ""performance""]","[""ads"", ""miui"", ""bloatware""]",5.6,Xiaomi 14 Pro delivers premium hardware at competitive price but MIUI remains divisive.
